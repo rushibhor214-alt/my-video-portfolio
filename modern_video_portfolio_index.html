@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Your Video Portfolio</title>
+  <meta name="description" content="Modern & clean personal video portfolio" />
+  <style>
+    :root{
+      --bg:#ffffff; --card:#f7f8fa; --muted:#6b7280; --accent:#0f172a; --glass: rgba(15,23,42,0.06);
+      --radius:14px; --gap:18px; --maxw:1100px;
+      font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; background:var(--bg); color:#0b1220; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+      display:flex; align-items:center; justify-content:center; padding:32px;
+    }
+    .wrap{width:100%; max-width:var(--maxw);}
+
+    header{display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:20px}
+    .brand{display:flex; align-items:center; gap:12px}
+    .logo{width:56px; height:56px; border-radius:12px; background:linear-gradient(135deg,#e6eefc,#ffffff); display:flex;align-items:center;justify-content:center; font-weight:700; color:var(--accent); box-shadow:0 6px 18px rgba(15,23,42,0.06)}
+    .title{font-size:18px; font-weight:700}
+    .subtitle{font-size:13px; color:var(--muted)}
+
+    .controls{display:flex; gap:10px; align-items:center}
+    .btn{background:var(--accent); color:#fff; border:none; padding:10px 14px; border-radius:10px; cursor:pointer; font-weight:600}
+    .btn.ghost{background:transparent; color:var(--accent); border:1px solid var(--glass)}
+
+    .hero{display:grid; grid-template-columns:1fr 360px; gap:24px; margin-bottom:24px}
+    .hero-card{background:var(--card); padding:18px; border-radius:var(--radius); box-shadow:0 6px 28px rgba(12,18,28,0.04)}
+    .hero-player{border-radius:12px; overflow:hidden; background:#000; min-height:200px; display:flex; align-items:center; justify-content:center}
+    .hero-player video, .hero-player iframe{width:100%; height:100%; display:block}
+
+    .upload-area{border:2px dashed var(--glass); padding:14px; border-radius:12px; text-align:center}
+    .upload-area input{display:none}
+    .upload-hint{color:var(--muted); font-size:13px}
+
+    .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:var(--gap)}
+    .card{background:var(--card); border-radius:12px; overflow:hidden; box-shadow:0 8px 18px rgba(12,18,28,0.04);}
+    .thumb{height:140px; background:#000; display:flex; align-items:center; justify-content:center}
+    .thumb video{width:100%; height:100%; object-fit:cover}
+    .meta{padding:12px}
+    .meta h4{margin:0 0 6px 0; font-size:15px}
+    .meta p{margin:0; font-size:13px; color:var(--muted)}
+
+    .modal{position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(2,6,23,0.6); z-index:60}
+    .modal.open{display:flex}
+    .modal-card{width:90%; max-width:980px; background:#fff; border-radius:12px; overflow:hidden}
+    .modal-card .player{height:560px; background:#000}
+    .modal-close{position:absolute; right:18px; top:18px; background:#fff; border-radius:10px; border:none; padding:8px 10px; cursor:pointer}
+
+    footer{margin-top:20px; color:var(--muted); font-size:13px; text-align:center}
+
+    /* responsive */
+    @media (max-width:880px){ .hero{grid-template-columns:1fr; } .hero-card{order:2} .wrap{padding:8px} }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo">RB</div>
+        <div>
+          <div class="title">Rushikesh Bhor — Video Portfolio</div>
+          <div class="subtitle">Cinematic clips • Showreel • Personal projects</div>
+        </div>
+      </div>
+      <div class="controls">
+        <label class="btn ghost" id="addUrlBtn">Add video URL</label>
+        <label class="btn" id="uploadBtn">Upload video</label>
+        <input id="fileInput" type="file" accept="video/*" style="display:none" multiple>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <div>
+              <div style="font-weight:700">Featured</div>
+              <div style="font-size:13px;color:var(--muted)">Click a thumbnail below to play it here</div>
+            </div>
+            <div style="font-size:13px;color:var(--muted)">Tips: Drag & drop files onto the grid</div>
+          </div>
+
+          <div class="hero-player" id="heroPlayer">
+            <!-- Default placeholder -->
+            <div style="color:#fff; text-align:center; padding:18px">
+              <div style="font-size:18px; font-weight:700">Your showreel</div>
+              <div style="margin-top:8px; color:#b9c0cc; font-size:14px">Upload or add a video URL to get started</div>
+            </div>
+          </div>
+
+        </div>
+
+        <aside class="hero-card">
+          <div style="font-weight:700; margin-bottom:10px">Quick actions</div>
+          <div class="upload-area" id="dropZone">
+            <p class="upload-hint">Drop videos here or click <strong>Upload video</strong></p>
+            <p style="font-size:13px; color:var(--muted); margin-top:8px">Supports MP4, WebM. Files are played locally in the browser.</p>
+          </div>
+
+          <div style="margin-top:12px; display:flex; gap:8px">
+            <button class="btn ghost" id="downloadTemplate">Download Resume</button>
+            <a class="btn" href="#contact" style="text-decoration:none">Contact</a>
+          </div>
+        </aside>
+      </section>
+
+      <section>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <h3 style="margin:0">Videos</h3>
+          <div style="color:var(--muted); font-size:13px">Click any thumbnail to open the player</div>
+        </div>
+
+        <div class="grid" id="gallery">
+          <!-- JS will populate thumbnails here -->
+        </div>
+      </section>
+
+    </main>
+
+    <footer id="contact" style="padding-top:18px">Made with ❤️ — Add your social links here</footer>
+  </div>
+
+  <!-- modal -->
+  <div class="modal" id="modal">
+    <div class="modal-card">
+      <div style="position:relative">
+        <button class="modal-close" id="modalClose">Close</button>
+        <div class="player" id="modalPlayer"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Simple client-side video portfolio logic
+    const gallery = document.getElementById('gallery');
+    const heroPlayer = document.getElementById('heroPlayer');
+    const fileInput = document.getElementById('fileInput');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const addUrlBtn = document.getElementById('addUrlBtn');
+    const dropZone = document.getElementById('dropZone');
+    const modal = document.getElementById('modal');
+    const modalPlayer = document.getElementById('modalPlayer');
+    const modalClose = document.getElementById('modalClose');
+
+    // Basic in-memory store for videos
+    // Each item: {id, type: 'file'|'embed', title, src, fileObject?}
+    const videos = [];
+
+    // helpers
+    function createThumbItem(item){
+      const card = document.createElement('div'); card.className='card';
+      const thumb = document.createElement('div'); thumb.className='thumb';
+      if(item.type==='file'){
+        const vid = document.createElement('video'); vid.src = item.src; vid.muted=true; vid.playsInline=true; vid.loop=true; vid.autoplay=true; thumb.appendChild(vid);
+      } else {
+        // embed: show a poster/placeholder with play icon
+        const wrapper = document.createElement('div'); wrapper.style.width='100%'; wrapper.style.height='100%'; wrapper.style.display='flex'; wrapper.style.alignItems='center'; wrapper.style.justifyContent='center'; wrapper.style.color='#fff'; wrapper.innerText='Embedded video'; thumb.appendChild(wrapper);
+      }
+      card.appendChild(thumb);
+      const meta = document.createElement('div'); meta.className='meta';
+      const h4 = document.createElement('h4'); h4.innerText = item.title || 'Untitled';
+      const p = document.createElement('p'); p.innerText = item.type === 'file' ? (formatBytes(item.fileSize||0)) : 'Embed';
+      meta.appendChild(h4); meta.appendChild(p);
+      card.appendChild(meta);
+
+      card.addEventListener('click', ()=> openInHero(item));
+
+      // enable drag to reorder (basic)
+      card.draggable = true;
+      card.addEventListener('dragstart',(e)=>{
+        e.dataTransfer.setData('text/plain', item.id);
+      });
+
+      return card;
+    }
+
+    function renderGallery(){
+      gallery.innerHTML='';
+      videos.forEach(v=> gallery.appendChild(createThumbItem(v)));
+    }
+
+    function openInHero(item){
+      heroPlayer.innerHTML = '';
+      if(item.type==='file'){
+        const v = document.createElement('video');
+        v.controls = true; v.src = item.src; v.autoplay = true; v.playsInline = true; v.style.maxHeight='480px';
+        heroPlayer.appendChild(v);
+      } else {
+        const iframe = document.createElement('iframe');
+        iframe.src = item.src; iframe.frameBorder='0'; iframe.allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'; iframe.allowFullscreen = true; heroPlayer.appendChild(iframe);
+      }
+    }
+
+    function openModal(item){
+      modalPlayer.innerHTML='';
+      if(item.type==='file'){
+        const v = document.createElement('video'); v.controls=true; v.autoplay=true; v.src = item.src; v.style.width='100%'; v.style.height='100%'; modalPlayer.appendChild(v);
+      } else {
+        const iframe = document.createElement('iframe'); iframe.src = item.src; iframe.style.width='100%'; iframe.style.height='100%'; iframe.frameBorder='0'; iframe.allowFullscreen=true; modalPlayer.appendChild(iframe);
+      }
+      modal.classList.add('open');
+    }
+
+    modalClose.addEventListener('click', ()=> modal.classList.remove('open'));
+    modal.addEventListener('click', (e)=>{ if(e.target===modal) modal.classList.remove('open') });
+
+    function addFile(file){
+      const id = cryptoRandom();
+      const url = URL.createObjectURL(file);
+      const item = {id, type:'file', title: file.name, src:url, fileSize: file.size, fileObject:file };
+      videos.unshift(item); renderGallery();
+    }
+
+    function addEmbed(url){
+      const id = cryptoRandom();
+      // Basic normalization for youtube share links
+      let src = url.trim();
+      if(src.includes('youtube.com') || src.includes('youtu.be')){
+        const videoId = extractYouTubeID(src);
+        if(videoId) src = `https://www.youtube.com/embed/${videoId}`;
+      }
+      const item = {id, type:'embed', title:src, src};
+      videos.unshift(item); renderGallery();
+    }
+
+    // events
+    uploadBtn.addEventListener('click', ()=> fileInput.click());
+    fileInput.addEventListener('change', (e)=>{ Array.from(e.target.files).forEach(f=> addFile(f)); fileInput.value=''; });
+
+    addUrlBtn.addEventListener('click', ()=>{
+      const url = prompt('Paste a video URL (YouTube, Vimeo, or embed link):');
+      if(url) addEmbed(url);
+    });
+
+    // drag/drop
+    ;['dragenter','dragover'].forEach(ev=> dropZone.addEventListener(ev,(e)=>{ e.preventDefault(); dropZone.style.borderColor='#cbd5e1'}));
+    ;['dragleave','drop'].forEach(ev=> dropZone.addEventListener(ev,(e)=>{ e.preventDefault(); dropZone.style.borderColor=''; }));
+    dropZone.addEventListener('drop',(e)=>{
+      const dt = e.dataTransfer; if(!dt) return; const files = Array.from(dt.files||[]); files.forEach(f=> { if(f.type.startsWith('video')) addFile(f); });
+    });
+
+    // helper utils
+    function cryptoRandom(){ return Math.random().toString(36).slice(2,9); }
+    function formatBytes(bytes, decimals=1){ if(bytes===0) return '0 B'; const k=1024; const dm = decimals<0?0:decimals; const sizes=['B','KB','MB','GB']; const i = Math.floor(Math.log(bytes)/Math.log(k)); return parseFloat((bytes/Math.pow(k,i)).toFixed(dm)) + ' ' + sizes[i]; }
+    function extractYouTubeID(url){ try{ const u = new URL(url); if(u.hostname.includes('youtu.be')) return u.pathname.slice(1); if(u.searchParams.get('v')) return u.searchParams.get('v'); const paths = u.pathname.split('/'); return paths.pop()||paths.pop(); }catch(e){return null} }
+
+    // init with an example (replace or remove these when you add yours)
+    (function initDemo(){
+      // sample embed (YouTube) - feel free to remove
+      addEmbed('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+      // sample demo video (blank placeholder) - you can replace by uploading
+      // addFile will be used when user uploads
+    })();
+
+    // small UX: open in modal on double click
+    gallery.addEventListener('dblclick',(e)=>{
+      const card = e.target.closest('.card'); if(!card) return; const idx = Array.from(gallery.children).indexOf(card); if(idx>=0 && videos[idx]) openModal(videos[idx]);
+    });
+
+    // keyboard: space to play/pause featured
+    document.addEventListener('keydown',(e)=>{ if(e.code==='Space'){ const vid = heroPlayer.querySelector('video'); if(vid){ if(vid.paused) vid.play(); else vid.pause(); e.preventDefault(); } } });
+
+    // drag reorder support: drop on gallery
+    gallery.addEventListener('dragover',(e)=> e.preventDefault());
+    gallery.addEventListener('drop',(e)=>{
+      e.preventDefault(); const id = e.dataTransfer.getData('text/plain'); if(!id) return; const fromIdx = videos.findIndex(v=>v.id===id); if(fromIdx<0) return; const toIdx = Math.min(videos.length-1, Math.floor((e.offsetX / gallery.clientWidth) * videos.length)); const [item] = videos.splice(fromIdx,1); videos.splice(toIdx,0,item); renderGallery();
+    });
+
+    // save / load to localStorage (basic)
+    window.addEventListener('beforeunload', ()=>{
+      // we do not store file blobs; only embeds and metadata
+      const stored = videos.filter(v=>v.type==='embed').map(v=> ({id:v.id,type:v.type,title:v.title,src:v.src}));
+      localStorage.setItem('vp_embeds', JSON.stringify(stored));
+    });
+    (function restore(){
+      try{
+        const stored = JSON.parse(localStorage.getItem('vp_embeds')||'[]'); stored.reverse().forEach(s=> videos.unshift(s)); renderGallery();
+      }catch(e){}
+    })();
+
+  </script>
+
+  <!--
+    Instructions:
+    - Save this file as `index.html` and open in a modern browser.
+    - Click "Upload video" to add local files (they play locally via URL.createObjectURL).
+    - Click "Add video URL" to paste YouTube/Vimeo links (will try to use embed URL).
+    - Double-click a thumbnail to open it in a larger modal player.
+    - This is a static, client-side site — to publish online, host the file on GitHub Pages or Netlify.
+  -->
+</body>
+</html>
